@@ -18,7 +18,7 @@ for (const [name, vp] of [['phone', { width: 390, height: 844, deviceScaleFactor
   await p.click('[data-plat="reels"]'); await new Promise(r => setTimeout(r, 1500));
   await p.click('#approve'); await new Promise(r => setTimeout(r, 500));
   await p.screenshot({ path: out + name + '-3-reels-approved.png' });
-  await p.goto('http://localhost:8801/#impact', { waitUntil: 'networkidle2' });
+  await p.goto('http://localhost:8801/#impact', { waitUntil: 'domcontentloaded' }); await new Promise(r => setTimeout(r, 1500));
   await p.screenshot({ path: out + name + '-4-impact.png', fullPage: name === 'phone' });
 }
 await b.close();
