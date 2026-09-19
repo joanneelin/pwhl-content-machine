@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Content Machine · PWHL prototype</title>
+<meta name="description" content="Student prototype: an AI content co-producer for the PWHL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <span class="word">Content Machine</span>
+    </div>
+    <span class="pill">Demo</span>
+  </header>
+
+  <nav class="tabs" aria-label="Sections">
+    <button class="tab" data-tab="trending" id="tab-trending">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"/></svg><span>Trending</span></button>
+    <button class="tab" data-tab="studio" id="tab-studio">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg><span>Studio</span></button>
+    <button class="tab" data-tab="impact" id="tab-impact">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Impact</span></button>
+  </nav>
+
+  <main id="view" tabindex="-1"></main>
+
+  <footer class="foot">Student prototype for Ideathon 2026 · not an official PWHL product · clips embedded from the PWHL YouTube channel · fan comments from public Reddit threads</footer>
+</div>
+
+<div class="intro" id="intro" hidden>
+  <div class="intro-card" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+    <p class="kicker">Prototype for the PWHL</p>
+    <h1 id="intro-title">Content Machine</h1>
+    <p>Content Machine reads what PWHL fans share, finds the moments they love, and drafts ready-to-post videos. <strong>Your team approves every post.</strong></p>
+    <ol class="intro-steps">
+      <li><span><b>Trending</b> See what fans are talking about</span></li>
+      <li><span><b>Studio</b> Generate drafts for TikTok, Reels and Shorts</span></li>
+      <li><span><b>Impact</b> See the time and money it saves</span></li>
+    </ol>
+    <button class="btn primary big" id="intro-start">Start</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="data/data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
