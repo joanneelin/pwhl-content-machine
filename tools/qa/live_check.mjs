@@ -1,0 +1,11 @@
+import puppeteer from 'puppeteer-core';
+import fs from 'fs'; fs.mkdirSync(new URL('../../qa-shots/', import.meta.url).pathname, { recursive: true });
+const b = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: 'new', args: ['--no-sandbox','--autoplay-policy=no-user-gesture-required'] });
+const p = await b.newPage(); await p.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
+await p.goto('https://joanneelin.github.io/pwhl-content-machine/?nointro#trending', { waitUntil: 'domcontentloaded' });
+await new Promise(r => setTimeout(r, 2500));
+await p.screenshot({ path: new URL('../../qa-shots/live1.png', import.meta.url).pathname });
+await p.click('[data-gen="m1"]'); await new Promise(r => setTimeout(r, 8000));
+await p.screenshot({ path: new URL('../../qa-shots/live2.png', import.meta.url).pathname });
+await b.close(); console.log(errs.length ? errs.join('\n') : 'no errors');

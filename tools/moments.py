@@ -2,7 +2,7 @@
 import json, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = "/Users/joannelin/Documents/Ideathon/content-machine/data"
+SRC = os.path.join(HERE, "..", "data", "source")
 clips = json.load(open(f"{SRC}/clips.json"))
 clips = clips["clips"] if isinstance(clips, dict) else clips
 signals = json.load(open(f"{SRC}/signals.json"))

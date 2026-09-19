@@ -1,0 +1,7 @@
+{
+  "name": "content-machine-qa",
+  "private": true,
+  "type": "module",
+  "description": "Headless-Chrome click-through checks for the Content Machine demo",
+  "dependencies": { "puppeteer-core": "^24.0.0" }
+}
