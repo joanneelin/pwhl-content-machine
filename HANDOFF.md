@@ -3,7 +3,7 @@
 **Live site:** https://joanneelin.github.io/pwhl-content-machine/
 **Repo:** https://github.com/joanneelin/pwhl-content-machine (public)
 **QR code for the slides:** `Ideathon/Content_Machine_QR.png` on Joanne's machine. It points at the live site; regenerate it if the URL changes.
-**Last updated:** Sept 19, 2026
+**Last updated:** Sept 19, 2026. This is the full, reviewed build. It replaced the quick build that was live before, at the same URL, so the QR code still works.
 
 ---
 
@@ -23,29 +23,36 @@ This means the demo can't fail in front of judges. Judges scan a QR code on slid
 ### What a judge sees
 | Tab | What it does |
 |---|---|
-| **Trending** (Listen & Rank) | 9 moments ranked by a buzz score. Each shows a clip thumbnail, a top real r/PWHL comment with upvotes and a link, and player tags. Includes filter chips (All / Stars / Big Moments / Fan Culture), a "See all fan comments" toggle, and a **"Paste a fan post or type a topic"** box that keyword-matches any text to the closest moment. Unmatched text falls back to the top moment, labeled "Closest match." |
-| **Studio** (Draft) | A roughly 4.6-second animation walks through 4 steps: reading comments → picking a clip → writing in the PWHL voice → checking facts. Then a TikTok / Reels / Shorts switcher shows a phone mockup playing the real clip, with a hook, caption and hashtags. Below it: an editable caption (the edits update the phone preview live), a suggested post time, **Regenerate** (switches to the other caption version), **Approve** (shows "queued for your team ✓"), **Next moment**, a "Why this clip" card with real fan quotes, and a "Facts checked" list. |
-| **Impact** | 280 drafts a week, about 90 hours saved a week, about 86% lower cost, and a count of drafts approved in this session. Also a cost bar comparison ($125K for a hire vs. $18K a year for the machine), top players by fan mentions (counted live from the quotes), and a planned platform mix. Everything is labeled as an estimate. |
+| **Trending** (Listen & Rank) | **8 moments** ranked by a buzz score. Each shows a clip thumbnail, a real r/PWHL comment with upvotes and a link, and player tags. Includes filter chips (All / Stars / Big Moments / Fan Culture), "Try" suggestion chips, and a **"Paste a fan post or type a topic"** finder that keyword-matches any text to a moment. If nothing matches, it says so honestly ("Closest match… nothing on that in today's scan yet") and opens the #1 moment. |
+| **Studio** (Draft) | A short "How it drafts" run (read comments → pick the clip → write drafts → check facts; labeled as a demo run). Then a TikTok / Reels / Shorts switcher shows a realistic phone mockup playing the real clip with that platform's app chrome. Below it: an editable caption (updates the phone preview live), **3 versions per platform** (Regenerate cycles through them), hashtags, **Approve**, **Next moment**, a "Why this clip" card with real fan quotes, and "Facts checked". |
+| **Impact** | 280 drafts a week, about 90 hours saved a week, about 86% lower cost, and a count of drafts approved in this session. Also cost bars ($125K for a hire vs. $18K a year), top players by fan mentions (counted live from the quotes), and a planned platform mix. Estimates carry an "EST." tag. |
 
 The first visit shows a one-card intro. Add `?nointro` to the URL to skip it, which is useful for rehearsing. Deep links work: `#trending`, `#studio/m3`, `#impact`.
+
+The moments are: m1 Captain Clutch, triple overtime · m2 Montréal delivers the Cup · m3 KK Harvey goes first overall · m4 Everyone watches women's hockey · m5 Motor City stands up · m6 Frost and the Furious · m7 Goldeneyes goal #1 · m8 Maltais, TikTok style.
 
 ---
 
 ## 2. Repo layout
 
 ```
-index.html            page shell: header, tabs, intro card, toast, footer
-styles.css            all styling (design tokens at the top)
-app.js                all behaviour: hash routing, rendering, matching, animation, video embeds
-data/data.js          GENERATED: window.CM_DATA = {clips, signals, moments}. Don't hand-edit.
-data/source/          clips.json (20 checked YouTube clips) + signals.json (36 real Reddit quotes)
-assets/thumbs/        a local thumbnail for every clip (poster image + offline fallback)
-tools/moments.py      THE CONTENT FILE: the 9 moments, captions, facts; builds data/data.js
-tools/qa/             headless-Chrome click-through scripts (flow.mjs, live_check.mjs)
-HANDOFF.md            this file
+index.html              page shell
+css/app.css             all styling (design tokens at the top; self-hosted EB Garamond)
+js/app.js               all behaviour: routing, rendering, finder, drafting animation, video embeds
+data/clips.json         20 checked PWHL YouTube clips (id, title from oEmbed, players, teams, thumb_path)
+data/signals.json       36 real r/PWHL quotes (verbatim, no usernames)
+data/moments.json       THE CONTENT FILE: 8 moments, 3 caption versions per platform, facts, keywords
+data/data.js            GENERATED by tools/build-data.mjs. Don't hand-edit.
+assets/thumbs/          full-size thumbnails; sm/ and md/ are resized copies
+assets/fonts/           EB Garamond (woff2, SIL Open Font License), so no Google Fonts dependency
+assets/icon.svg         favicon
+tools/build-data.mjs    rebuilds data/data.js from the three JSON files and checks every reference
+tools/make-thumbs.sh    makes the sm/ and md/ thumbnail copies (macOS `sips`)
+qa/                     headless-Chrome test scripts (flow, robustness, search)
+HANDOFF.md              this file
 ```
 
-No framework and no build step. The data is loaded as a `<script>` instead of with `fetch()`, so the page also works when opened straight from disk (`file://`). All paths are relative, which it needs because GitHub Pages serves it from the `/pwhl-content-machine/` sub-path. The only outside requests are Google Fonts (EB Garamond), `youtube-nocookie.com` embeds, and nothing else.
+No framework and no build step. The data is loaded as a `<script>` instead of with `fetch()`, so the page also works when opened straight from disk (`file://`). All paths are relative, which it needs because GitHub Pages serves it from the `/pwhl-content-machine/` sub-path. The only outside requests are YouTube embeds (`youtube-nocookie.com`) and nothing else. The font is bundled.
 
 ---
 
@@ -54,7 +61,7 @@ No framework and no build step. The data is loaded as a `<script>` instead of wi
 **Run locally**
 ```bash
 cd content-machine-live
-python3 -m http.server 8801      # then open http://localhost:8801/?nointro
+python3 -m http.server 8760      # then open http://localhost:8760/?nointro
 ```
 
 **Deploy:** push to `main`. GitHub Pages rebuilds the site within about a minute. No other steps.
@@ -62,15 +69,16 @@ python3 -m http.server 8801      # then open http://localhost:8801/?nointro
 git add -A && git commit -m "…" && git push
 ```
 
-**Change captions, facts, buzz scores or which clip a moment uses:** edit `tools/moments.py`, then:
+**Change captions, facts, buzz scores or which clip a moment uses:** edit `data/moments.json`, then:
 ```bash
-python3 tools/moments.py     # rewrites data/data.js; asserts every clip_id and signal_id exists
+node tools/build-data.mjs      # rewrites data/data.js and reports any broken clip/quote references
 ```
 
-**Add a new moment:** copy one entry in `M` inside `tools/moments.py`.
-- **Required fields:** `id`, `title`, `category` (`Stars` / `Big Moments` / `Fan Culture`), `buzz` (0–100; sets the rank), `clip_id`, `signal_ids`, `players`, `comments_read`, `keywords`, `why_this_clip`, `facts`.
-- **Drafts:** `drafts.tiktok|reels|shorts`, a list of versions made with `d(hook, caption, hashtags, post_time)`. Regenerate cycles through however many versions you give it.
-- **Keywords** power the paste box. Use lowercase and include nicknames. Multi-word phrases score higher than single words.
+**Moment fields:**
+- **Basics:** `id`, `title`, `category` (`Stars` / `Big Moments` / `Fan Culture`), `buzz` (0–100; sets the rank), `clip_id`, `signal_ids`, `players`.
+- **Finder:** `keywords` (lowercase; used by the finder).
+- **Supporting text:** `why_this_clip`, `comments_read` (a demo number), `facts` (`{text, source}`).
+- **Drafts:** `drafts.tiktok|reels|shorts`, each a list of `{hook, caption, hashtags, post_time}`.
 
 **Add a new clip**
 1. Get the video ID from the PWHL channel (`@thepwhlofficial`, channel id `UCNKUkQV2R0JKakyE1vuC1lQ`).
@@ -78,20 +86,21 @@ python3 tools/moments.py     # rewrites data/data.js; asserts every clip_id and 
    ```bash
    curl -s -o /dev/null -w "%{http_code}" "https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=VIDEO_ID&format=json"
    ```
-3. Download a thumbnail to `assets/thumbs/VIDEO_ID.jpg` (from `https://i.ytimg.com/vi/VIDEO_ID/hqdefault.jpg`).
-4. Add an entry to `data/source/clips.json`: `id`, `title` (copied from the oEmbed response), `thumb_path`, `players`, `category`.
-5. Rerun `python3 tools/moments.py`.
+3. Download a thumbnail to `assets/thumbs/VIDEO_ID.jpg` (from `https://i.ytimg.com/vi/VIDEO_ID/hqdefault.jpg`), then run `sh tools/make-thumbs.sh`.
+4. Add an entry to `data/clips.json`: `id`, `title` (copied from the oEmbed response), `thumb_path`, `players`, `teams`, `category`.
+5. Rerun `node tools/build-data.mjs`.
 
-**Add a fan quote:** add it to `data/source/signals.json` with `id`, `quote`, `score`, `subreddit`, `url`, `theme` and `players`. **Copy it word for word from a real comment, and don't include usernames.** The source threads are saved in `Ideathon/research/reddit-threads/*.txt` on Joanne's machine.
+**Add a fan quote:** add it to `data/signals.json` with `id`, `quote`, `score`, `subreddit`, `url`, `theme`, `players` and `source_file`. **Copy it word for word from a real comment, and don't include usernames.** The source threads are saved in `Ideathon/research/reddit-threads/*.txt` on Joanne's machine.
 
-**Test it in a real browser (optional, needs Google Chrome)**
+**Test it in a real browser (needs Google Chrome)**
 ```bash
-cd tools/qa && npm install
-python3 -m http.server 8801 -d ../..   # in another terminal, from the repo root
-node flow.mjs          # phone + desktop click-through, screenshots saved to qa-shots/
-node live_check.mjs    # checks the LIVE site at phone size, screenshots saved to qa-shots/
+cd qa && npm install                                  # installs puppeteer-core
+python3 -m http.server 8760 -d ..                     # in another terminal, from qa/
+node flow.mjs http://localhost:8760/                  # full judge walk, phone + desktop: expects "36/36 checks passed"
+node robustness.mjs http://localhost:8760/            # offline, blocked storage, reduced motion, bad deep links, no sideways scroll…
+node search_check.mjs                                 # finder sanity check on sample queries (uses port 8760)
 ```
-Both scripts print any console or page errors. `qa-shots/` is gitignored. The scripts expect Chrome at `/Applications/Google Chrome.app/…`, so change `executablePath` on other machines.
+Screenshots go to `qa/shots/` (gitignored). The scripts expect Chrome at `/Applications/Google Chrome.app/…`, so change `executablePath` on other machines. **Before any presentation:** run `flow.mjs` against the live URL too, then open the live site on a real phone.
 
 ---
 
@@ -101,18 +110,21 @@ These matter because PWHL executives are among the judges:
 - **Quotes are real and word for word.** Never write or "improve" a fan quote. Trimming at a sentence boundary with "…" is fine.
 - **No usernames** anywhere.
 - **No X/Twitter content.** We don't have real posts, and inventing them would be dishonest.
-- **Every "fact checked" line and every player-team pairing** has to come from the verified list below or from the clip's own title. Captions can't describe action the clip title doesn't support; we write captions without watching the clips.
+- **Facts and pairings are verified.** Every "fact checked" line and every player-team pairing has to come from the verified list below or from the clip's own title. Captions can't describe action the clip doesn't support; we write captions without watching the full clips. If a clip is from a player's previous team, say so (see m8).
+- **Label estimates.** Keep the "demo / EST." labels on estimated or simulated numbers (buzz scores, comments read, the 5,000-posts figure, hours saved).
 - **Voice:** bold, warm, inclusive. **Never compare the women's game to the men's.** Say "intermission," never "halftime." Don't call pros "girls."
 - **This is a student prototype, not an official PWHL product.** Don't use the PWHL logo as the app's branding, and keep the footer disclaimer.
-- **Impact numbers must match the deck:** 280 drafts a week (40 a day), 5,000 fan posts scanned a day, about $18K a year vs. about $125K for a hire, about 86% lower. If the deck changes, change `renderImpact()` in `app.js`.
+- **Impact numbers must match the deck:** 280 drafts a week (40 a day), 5,000 fan posts scanned a day, about $18K a year vs. about $125K for a hire, about 86% lower. "About 90 hours a week" is our own estimate (280 drafts × about 20 minutes each) and is labeled EST.
 
 **Verified facts used in the demo**
-- Poulin (Montréal): Olympic women's goals record (20); 2026 Walter Cup champion and playoff MVP.
-- Knight (Detroit, signed through 2028–29): US Olympic records of 15 goals and 33 points.
-- Harvey (Vancouver): 2026 Olympic MVP and 2026 #1 draft pick.
-- Frankel (Boston): first goalie to win PWHL MVP; record 8 shutouts.
-- Fillier (New York). Maltais (Montréal).
-- Detroit is one of four 2026–27 expansion teams.
+- 12 teams in 2026–27. Detroit, Hamilton, Las Vegas and San Jose are the expansion teams.
+- Montréal won the 2026 Walter Cup, the first Canadian team to do it. Minnesota won in 2024 and 2025.
+- Poulin (Montréal): Olympic women's goals record (20).
+- Knight (Detroit).
+- Harvey (Vancouver): 2026 Olympic MVP and 2026 #1 pick.
+- Edwards (San Jose): 2026 #4 pick.
+- Frankel (Boston): first goalie to win PWHL MVP.
+- Maltais (Montréal).
 - Every game streams free on YouTube outside Canada.
 - PWHL has the #1 Instagram engagement rate (9.4%) of 13 major leagues.
 - 1.1M+ regular-season fans in 2025–26 (9,304 per game).
@@ -122,26 +134,31 @@ These matter because PWHL executives are among the judges:
 ## 5. Design system (matches the slide deck)
 
 - **Colors:** background gradient `#05022A` → `#1A0552` → `#2E067E` with a violet glow. Accent purple `#7E3EF6`, ice blue `#5EAEF8` (numbers), lavender `#B9A2FF` (labels), muted text `#C8C2E8`, dim text `#8F86C2`, deep purple `#2A0B7A`.
-- **Type:** **EB Garamond** everywhere in the app. The phone mockups use the system sans-serif so they look like the real apps.
-- **Layout:** phone-first. There's a bottom tab bar under 900px and a top tab row with two-column layouts from 900px up.
+- **Type:** **EB Garamond** (bundled) for the app. The phone mockups use the system sans-serif so they look like the real apps.
+- **Layout:** phone-first. There's a bottom tab bar on phones, and a top tab row with a two-column Studio on desktop. It was tested down to 320px wide, with no sideways scrolling.
 
 ---
 
 ## 6. Known gaps and next steps
 
-1. **Captions:** each platform has **2** versions per moment. The original plan was 3; add a third with `d(...)`.
-2. **Desktop layout:** checked in code but only lightly checked on a real screen. Look at 1440×900 (a projector) before presenting.
-3. **YouTube's own overlay:** the embed briefly shows its title and play/pause button on top of our mockup. YouTube controls this, and `controls=0` doesn't remove it entirely. A fix would be to download the clips as MP4s and use `<video>`, but that's a copyright gray area, which is why we embed.
-4. **Offline:** if the network drops, each preview falls back to the thumbnail and shows "Video preview offline" after about 7 seconds. Venue Wi-Fi is the biggest risk, so **keep a screen recording of the demo as backup.**
-5. **Missing favicon:** harmless 404 in the console. Add a `favicon.ico` if you want a clean console.
-6. **No automated review yet.** A fuller build with four QA reviewers was running in the background. Its partial output is in `Ideathon/content-machine/` on Joanne's machine and is **not deployed**. It has 8 moments with 3 caption versions each in `data/moments.json`, plus its own `qa/` harness. If you finish or check it, deploy by copying it into this repo, so the URL (and the QR code) stays the same.
-7. **Paste box matching** is plain keyword overlap. Anything it can't match falls back to the top moment, labeled "Closest match." That's intentional so it never shows an empty result.
-8. **Buzz scores and "comments read" counts are demo numbers,** labeled "demo" in the app.
+**Reviewed:** four QA reviewers (phone UX, embeds and links, accuracy, break-it testing) checked this build. A fixer fixed 28 issues, and an independent regression check confirmed the fixes. After that:
+
+1. **Approve can hide under the tab bar** on short phone screens (about 667px tall, e.g. an iPhone SE in Safari). The judge has to scroll a little.
+2. **Short phones show few trending moments** on the first screen (below the finder). The judge has to scroll.
+3. **The finder is simple keyword matching.** Searching a player with no moment (e.g. Laila Edwards, Aerin Frankel) opens the #1 moment with an honest "Closest match" note. That's by design; adding moments for more players is the real fix. First names alone are ignored, so "Sarah Fillier" can't match Sarah Nurse's clip.
+4. **"Picking the most-shared clip"** is a simulated step. We have no real share data; the run is labeled as a demo run.
+5. **YouTube-dependent risks.**
+   - The poster stays up until the clip actually plays, and you get a "Video preview offline" note if it can't load.
+   - If a venue network blocks YouTube completely, a browser error can still show inside the phone frame.
+   - **Keep a screen recording of the demo as backup.**
+6. **Soft video:** embedded video can look soft next to the sharp overlay text. YouTube controls the stream quality.
+7. **No reset button:** rehearsal state (approvals, edits, filters) is kept per browser tab. Present from a fresh tab, or scan the QR code on a fresh phone.
 
 ---
 
 ## 7. Related materials (on Joanne's machine, `Ideathon/`)
 
-- `PWHL_Join_Our_Why.pptx`: the pitch deck. The demo QR code goes on slide 9 ("See it work") and slide 20 (closing). Built with `deck/build.js` (EB Garamond, PWHL purple).
+- `PWHL_Join_Our_Why.pptx`: the pitch deck. The demo QR code goes on slide 9 ("See it work") and slide 20 (closing). Built with `deck/build.js` (EB Garamond, PWHL purple). The JOY section slides are in `deck/joy_slides.js`, and a standalone copy is in `JOY_youth_slides.pptx`.
 - `JOY_graphic.pptx` and `JOY_graphic_*.png`: the "Join Our (Wh)Y" graphic.
+- `content-machine/`: the working folder this build came from, including the reviewers' test scripts and screenshots (`qa/accuracy`, `qa/phone-ux`, `qa/break-it`, `qa/embeds-links`, `qa/regression`).
 - `research/`: Reddit threads, the three campaign concepts, slide design notes and the slide outline.

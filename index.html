@@ -1,56 +1,102 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Content Machine · PWHL prototype</title>
-<meta name="description" content="Student prototype: an AI content co-producer for the PWHL.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Content Machine</title>
+  <meta name="description" content="Student prototype for Ideathon 2026: Content Machine reads what PWHL fans share, finds the moments they love, and drafts ready-to-post videos for a human team to approve.">
+  <meta name="theme-color" content="#05022A">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://www.youtube-nocookie.com">
+  <script>
+    /* Decide before first paint whether the intro card shows (it is in the HTML so a slow
+       network still paints something). Storage can throw: then the intro just shows.
+       Preload the body font when hosted (a font preload is a CORS request, which file:// refuses). */
+    (function () {
+      var skip = /[?&]nointro\b/.test(location.search);
+      try { skip = skip || sessionStorage.getItem('cm.introSeen') === 'true'; } catch (e) {}
+      if (skip) document.documentElement.className += ' intro-skip';
+      if (location.protocol !== 'file:') {
+        var l = document.createElement('link');
+        l.rel = 'preload'; l.as = 'font'; l.type = 'font/woff2'; l.crossOrigin = 'anonymous';
+        l.href = 'assets/fonts/eb-garamond-latin.woff2';
+        document.head.appendChild(l);
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="css/app.css?v=3">
+  <noscript><style>.intro { display: none !important; }</style></noscript>
 </head>
 <body>
-<div class="app">
-  <header class="top">
-    <div class="brand">
-      <span class="mark" aria-hidden="true"></span>
-      <span class="word">Content Machine</span>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar" id="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#trending" aria-label="Content Machine, go to Trending">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="bm-g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#7E3EF6"/>
+              <stop offset="1" stop-color="#5EAEF8"/>
+            </linearGradient>
+          </defs>
+          <rect x="1" y="1" width="62" height="62" rx="16" fill="url(#bm-g)"/>
+          <path d="M24 19.5v25l20-12.5z" fill="#fff"/>
+          <path d="M48 9l1.6 4.4L54 15l-4.4 1.6L48 21l-1.6-4.4L42 15l4.4-1.6z" fill="#fff" opacity=".9"/>
+        </svg>
+        <span class="brand-name">Content Machine</span>
+      </a>
+      <nav class="tabs-top" aria-label="Sections">
+        <a class="tab-top" href="#trending" data-tab="trending">Trending</a>
+        <a class="tab-top" href="#studio" data-tab="studio">Studio</a>
+        <a class="tab-top" href="#impact" data-tab="impact">Impact</a>
+      </nav>
+      <span class="proto-pill">Prototype<span class="pp-more"> · demo data</span></span>
     </div>
-    <span class="pill">Demo</span>
   </header>
 
-  <nav class="tabs" aria-label="Sections">
-    <button class="tab" data-tab="trending" id="tab-trending">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"/></svg><span>Trending</span></button>
-    <button class="tab" data-tab="studio" id="tab-studio">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg><span>Studio</span></button>
-    <button class="tab" data-tab="impact" id="tab-impact">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Impact</span></button>
+  <main id="main" tabindex="-1">
+    <div id="view" class="view-host"></div>
+    <footer class="site-foot">
+      Student prototype for Ideathon 2026 · not an official PWHL product · clips embedded from the PWHL YouTube channel · fan comments from public Reddit threads
+    </footer>
+  </main>
+
+  <nav class="tabbar" aria-label="Sections">
+    <a class="tabbar-item" href="#trending" data-tab="trending">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
+      <span>Trending</span>
+    </a>
+    <a class="tabbar-item" href="#studio" data-tab="studio">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3.5l1.9 5.1 5.1 1.9-5.1 1.9L11 17.5l-1.9-5.1L4 10.5l5.1-1.9z"/><path d="M18.5 15.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>
+      <span>Studio</span>
+    </a>
+    <a class="tabbar-item" href="#impact" data-tab="impact">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V11"/><path d="M12 20V5"/><path d="M19 20v-6"/></svg>
+      <span>Impact</span>
+    </a>
   </nav>
 
-  <main id="view" tabindex="-1"></main>
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <footer class="foot">Student prototype for Ideathon 2026 · not an official PWHL product · clips embedded from the PWHL YouTube channel · fan comments from public Reddit threads</footer>
-</div>
-
-<div class="intro" id="intro" hidden>
-  <div class="intro-card" role="dialog" aria-modal="true" aria-labelledby="intro-title">
-    <p class="kicker">Prototype for the PWHL</p>
-    <h1 id="intro-title">Content Machine</h1>
-    <p>Content Machine reads what PWHL fans share, finds the moments they love, and drafts ready-to-post videos. <strong>Your team approves every post.</strong></p>
-    <ol class="intro-steps">
-      <li><span><b>Trending</b> See what fans are talking about</span></li>
-      <li><span><b>Studio</b> Generate drafts for TikTok, Reels and Shorts</span></li>
-      <li><span><b>Impact</b> See the time and money it saves</span></li>
-    </ol>
-    <button class="btn primary big" id="intro-start">Start</button>
+  <div id="intro" class="intro" role="dialog" aria-modal="true" aria-labelledby="intro-title" aria-describedby="intro-text">
+    <div class="intro-card">
+      <svg class="intro-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <rect x="1" y="1" width="62" height="62" rx="16" fill="url(#bm-g)"/>
+        <path d="M24 19.5v25l20-12.5z" fill="#fff"/>
+        <path d="M48 9l1.6 4.4L54 15l-4.4 1.6L48 21l-1.6-4.4L42 15l4.4-1.6z" fill="#fff" opacity=".9"/>
+      </svg>
+      <p class="eyebrow"><span class="nw">Student prototype</span> <span class="sep" aria-hidden="true">·</span> <span class="nw">Ideathon 2026</span></p>
+      <h2 id="intro-title" class="intro-title">Content Machine</h2>
+      <p id="intro-text" class="intro-text">Content Machine reads what PWHL fans share, finds the moments they love, and drafts ready-to-post videos. Your team approves every post.</p>
+      <button type="button" id="intro-start" class="btn btn-primary btn-lg intro-start">Start</button>
+    </div>
   </div>
-</div>
 
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="noscript">This demo needs JavaScript turned on.</p></noscript>
 
-<script src="data/data.js"></script>
-<script src="app.js"></script>
+  <script src="data/data.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
 </body>
 </html>

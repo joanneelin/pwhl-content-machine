@@ -2,3 +2,5 @@ qa-shots/
 tools/__pycache__/
 .DS_Store
 node_modules/
+qa/node_modules/
+qa/shots/
